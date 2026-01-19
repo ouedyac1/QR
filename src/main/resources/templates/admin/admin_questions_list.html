@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Questions reçues</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .home-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .home-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .stat-icon.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-info h3 {
+            color: #999;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info p {
+            color: #333;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filters h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .question-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .participant-name {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .anonymous {
+            color: #999;
+            font-style: italic;
+        }
+
+        .question-date {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .question-text {
+            color: #222;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
+            border-radius: 10px;
+            border-left: 6px solid #667eea;
+            box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.1);
+            position: relative;
+            padding-left: 2.5rem;
+            font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+        }
+
+        .question-text::before {
+            content: "❝";
+            font-size: 2rem;
+            color: #667eea;
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            opacity: 0.3;
+        }
+
+
+        .question-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .event-badge {
+            display: inline-block;
+            background: #e7f0ff;
+            color: #667eea;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+
+        .event-badge {
+            text-align: center;
+            padding: 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        @media (max-width: 768px) {
+            .question-number {
+                width: 36px;
+                height: 36px;
+                font-size: 0.85rem;
+            }
+        }
+
+
+        .site-logo {
+            max-height: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .question-header {
+                flex-direction: column;
+            }
+
+            .question-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="event-badge">
+            <img th:src="@{/img/logo.png}" alt="Logo" class="site-logo"/>
+            <!--            📱 <span th:text="${event.name}">Événement</span>-->
+        </div>
+        <div class="header-content">
+            <div>
+                <h1>Administration</h1>
+                <p style="margin-top: 0.5rem; opacity: 0.9;">Gestion des questions reçues</p>
+            </div>
+            <a href="/" class="home-link">Retour à l'accueil</a>
+            <a href="/admin/questions/export/pdf" class="home-link">📄 Exporter en PDF</a>
+
+        </div>
+<!--        <div style="text-align: right; margin-bottom: 1rem;">-->
+<!--            <a href="/admin/questions/export/pdf" class="home-link">📄 Exporter en PDF</a>-->
+<!--        </div>-->
+
+    </header>
+
+    <main>
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon primary">💬</div>
+                <div class="stat-info">
+                    <h3>Total des questions</h3>
+                    <p th:text="${questions.size()}">0</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon success">📅</div>
+                <div class="stat-info">
+                    <h3>Événements actifs</h3>
+                    <p th:text="${events.size()}">0</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon warning">⏰</div>
+                <div class="stat-info">
+                    <h3>Aujourd'hui</h3>
+                    <p th:text="${#lists.size(#lists.isEmpty(questions) ? {} : questions)}">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters" th:if="${!events.isEmpty()}">
+            <h2>Filtrer par événement</h2>
+            <div class="filter-buttons">
+                <a href="/admin/questions" class="filter-btn active">📋 Toutes les questions</a>
+                <a th:each="event : ${events}"
+                   th:href="@{/admin/questions/event/{id}(id=${event.id})}"
+                   class="filter-btn">
+                    🎯 <span th:text="${event.name}">Événement</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="questions-container" th:if="${!questions.isEmpty()}">
+            <div th:each="question, iter : ${questions}" class="question-card">
+                <div class="question-header">
+                    <div class="question-number">
+                        <span th:text="'#' + ${iter.count}">#1</span>
+                    </div>
+                    <div class="question-meta">
+                        <span th:if="${question.participantName != null and !#strings.isEmpty(question.participantName)}"
+                              class="participant-name"
+                              th:text="${question.participantName}">
+                            Nom du participant
+                        </span>
+                        <span th:if="${question.participantName == null or #strings.isEmpty(question.participantName)}"
+                              class="participant-name anonymous">
+                            👤 Anonyme
+                        </span>
+                        <span class="question-date"
+                              th:text="${#temporals.format(question.submittedAt, 'dd/MM/yyyy à HH:mm')}">
+                            Date
+                        </span>
+                    </div>
+                </div>
+
+                <div class="question-text" th:text="${question.question}">
+                    Texte de la question
+                </div>
+
+                <div class="question-footer">
+                    <span class="event-badge" th:text="${question.event.name}">
+                        Événement
+                    </span>
+
+<!--                    <form th:action="@{/admin/questions/delete/{id}(id=${question.id})}" -->
+<!--                          method="post" -->
+<!--                          style="margin: 0;"-->
+<!--                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette question ?');">-->
+<!--                        <button type="submit" class="delete-btn">🗑️ Supprimer</button>-->
+<!--                    </form>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state" th:if="${questions.isEmpty()}">
+            <div class="empty-state-icon">📭</div>
+            <h3>Aucune question reçue</h3>
+            <p>Les questions posées par les participants apparaîtront ici.</p>
+        </div>
+    </main>
+</body>
+</html>

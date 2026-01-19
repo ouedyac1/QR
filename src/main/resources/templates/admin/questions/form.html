@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nouvelle question</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+</head>
+<body class="p-5">
+<h2>Créer une question</h2>
+<form th:action="@{/admin/questions}" th:object="${question}" method="post">
+    <div class="mb-3">
+        <label>Texte</label>
+        <input type="text" class="form-control" th:field="*{text}" required>
+    </div>
+    <div class="mb-3">
+        <label>Type</label>
+        <select class="form-select" th:field="*{type}">
+            <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Événement</label>
+        <select class="form-select" th:field="*{eventId}">
+            <option value="">-- Sélectionnez un événement --</option>
+            <option th:each="e : ${events}" th:value="${e.id}" th:text="${e.name}"></option>
+        </select>
+    </div>
+    <button class="btn btn-success">💾 Enregistrer</button>
+    <a href="/admin/questions" class="btn btn-secondary">↩ Retour</a>
+</form>
+</body>
+</html>

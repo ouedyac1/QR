@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: qrcode-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: qrcode_db
+      POSTGRES_USER: qrcode_user
+      POSTGRES_PASSWORD: QrC0de_P@ss
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: qrcode-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: qrcode@defense.bf
+      PGADMIN_DEFAULT_PASSWORD: QrC0de@2026
+    depends_on:
+      - postgres
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+  app:
+    build: .
+    container_name: qrcode-app
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/qrcode_db
+      SPRING_DATASOURCE_USERNAME: qrcode_user
+      SPRING_DATASOURCE_PASSWORD: QrC0de_P@ss
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_THYMELEAF_CACHE: "false"
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "1600:1600"
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  pgdata:
+  pgadmin-data:

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'QR Code - ' + ${event.name}"></title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-image: url('/img/Armoirie.png'); /* ton image de fond */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: "Segoe UI", sans-serif;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        img {
+            width: 250px;
+            height: 250px;
+            border: 6px solid white;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        p {
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${event.name}"></h1>
+    <img th:src="@{'/qrcode/' + ${event.slug}}" alt="QR Code" />
+    <p>Scannez ce QR code pour accéder au questionnaire</p>
+</div>
+</body>
+</html>

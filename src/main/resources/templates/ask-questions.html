@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="'Question – ' + ${event.name}">Question</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #e6f4ea;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #34495e;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccd1d9;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #2c7be5;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .event-badge {
+            text-align: center;
+            padding: 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .site-logo {
+            max-height: 80px;
+        }
+
+        button:hover {
+            background-color: #1a68d1;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="event-badge">
+        <img th:src="@{/img/logo.png}" alt="Logo" class="site-logo"/>
+    </div>
+
+    <h2 th:text="${event.name}">Événement</h2>
+
+    <div th:if="${success}" class="success">
+        <p th:text="${success}"></p>
+    </div>
+
+    <form th:action="@{/ask/{slug}(slug=${event.slug})}"
+          th:object="${userQuestion}"
+          method="post">
+
+        <div class="form-group">
+            <label for="participantName">Grade, Nom et Prénom(s) *</label>
+            <input type="text"
+                   id="participantName"
+                   th:field="*{participantName}"
+                   required />
+        </div>
+
+        <div class="form-group">
+            <label for="question">Votre question *</label>
+            <textarea id="question"
+                      th:field="*{question}"
+                      placeholder="Saisissez votre question ici…"
+                      required></textarea>
+        </div>
+
+        <button type="submit">Envoyer la question</button>
+    </form>
+
+    <div class="footer">
+        Votre question sera transmise à l’organisateur de l’événement.
+    </div>
+
+</div>
+
+</body>
+</html>
