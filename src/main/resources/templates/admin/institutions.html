@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gestion des Institutions</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <style>
+
+
+        :root {
+            --blue:#667eea;--blue-dark:#4a5fc1;--blue-light:#eef0fd;--white:#fff;--bg:#f5f7fa;
+            --text:#1e2a4a;--text-muted:#6b7a99;--border:#dde3f0;--danger:#e74c6e;
+            --danger-light:#fff0f3;--success:#27ae60;--warning:#f39c12;--radius:10px;--shadow:0 2px 12px rgba(102,126,234,0.10);
+        }
+
+        /*body {*/
+        /*    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+        /*    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+        /*    min-height: 100vh;*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*    justify-content: center;*/
+        /*    padding: 2rem;*/
+        /*}*/
+
+        /* Header */
+        /*.page-header {*/
+        /*    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+        /*    padding:36px 40px 28px;border-radius:0 0 20px 20px;margin-bottom:32px;*/
+        /*    box-shadow:0 4px 20px rgba(102,126,234,.25);*/
+        /*}*/
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color:white; padding:36px 40px 28px;
+            border-radius:0 0 20px 20px; margin-bottom:32px;
+            box-shadow:0 4px 20px rgba(102,126,234,0.25);
+        }
+        .page-header h1 { font-size:22px;font-weight:700;margin:0; }
+        .page-header p  { margin:4px 0 0;opacity:.8;font-size:13.5px; }
+        .back-link {
+            color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;
+            display:inline-flex;align-items:center;gap:6px;margin-bottom:16px;transition:color .2s;
+        }
+        .back-link:hover { color:white; }
+        .nav-links { display:flex;gap:12px;margin-top:16px; }
+        .nav-link-btn {
+            color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;
+            padding:6px 14px;border:1.5px solid rgba(255,255,255,.35);border-radius:20px;transition:all .2s;
+        }
+        .nav-link-btn:hover,.nav-link-btn.active {
+            background:rgba(255,255,255,.2);color:white;border-color:rgba(255,255,255,.7);
+        }
+
+        /* Alertes */
+        .alert-custom {
+            border:none;border-radius:var(--radius);padding:12px 18px;font-size:13.5px;
+            display:flex;align-items:center;gap:10px;
+        }
+        .alert-success-custom { background:#edfaf3;color:var(--success);border-left:4px solid var(--success); }
+        .alert-error-custom   { background:var(--danger-light);color:var(--danger);border-left:4px solid var(--danger); }
+
+        /* Cards */
+        .card-custom {
+            background:var(--white);border-radius:var(--radius);border:1.5px solid var(--border);
+            box-shadow:var(--shadow);overflow:hidden;
+        }
+        .card-header-custom {
+            background:var(--blue-light);padding:16px 22px;border-bottom:1.5px solid var(--border);
+            font-weight:600;font-size:14px;color:var(--blue-dark);
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        .card-body-custom { padding:22px; }
+
+        /* Formulaires */
+        .form-control-custom {
+            width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;
+            font-size:13.5px;color:var(--text);background:var(--white);
+            transition:border-color .2s,box-shadow .2s;outline:none;
+        }
+        .form-control-custom:focus {
+            border-color:var(--blue);box-shadow:0 0 0 3px rgba(102,126,234,.12);
+        }
+        .form-label-custom {
+            font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;
+            letter-spacing:.06em;margin-bottom:6px;display:block;
+        }
+
+        /* Boutons */
+        .btn-primary {
+            background:var(--blue);color:white;border:none;border-radius:8px;padding:9px 20px;
+            font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;
+            display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+        }
+        .btn-primary:hover {
+            background:var(--blue-dark);box-shadow:0 4px 12px rgba(102,126,234,.3);
+            transform:translateY(-1px);color:white;
+        }
+
+        .btn-outline {
+            background:transparent;border:1.5px solid var(--border);border-radius:8px;padding:8px 16px;
+            font-size:13px;font-weight:500;color:var(--text);cursor:pointer;transition:all .2s;
+            display:inline-flex;align-items:center;gap:6px;
+        }
+        .btn-outline:hover { border-color:var(--blue);color:var(--blue);background:var(--blue-light); }
+
+        .btn-icon {
+            background:transparent;border:1.5px solid var(--border);border-radius:6px;
+            padding:5px 10px;font-size:12px;cursor:pointer;transition:all .2s;color:var(--text-muted);
+        }
+        .btn-icon:hover        { border-color:var(--blue);color:var(--blue);background:var(--blue-light); }
+        .btn-icon.danger:hover { border-color:var(--danger);color:var(--danger);background:var(--danger-light); }
+
+        .btn-cancel {
+            background:var(--bg);border:1.5px solid var(--border);color:var(--text-muted);
+            border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;transition:all .2s;
+        }
+        .btn-cancel:hover { border-color:var(--text-muted);color:var(--text); }
+
+        .btn-danger {
+            background:var(--danger);color:white;border:none;border-radius:8px;padding:8px 18px;
+            font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+        }
+        .btn-danger:hover { background:#c0392b; }
+
+        /* Table */
+        .inst-table { width:100%;border-collapse:collapse; }
+        .inst-table th {
+            font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+            color:var(--text-muted);padding:12px 16px;border-bottom:2px solid var(--border);text-align:left;
+        }
+        .inst-table td {
+            padding:14px 16px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle;
+        }
+        .inst-table tr:last-child td { border-bottom:none; }
+        .inst-table tr:hover td { background:var(--blue-light);transition:background .15s; }
+
+        /* Badges */
+        .code-badge {
+            display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;
+            letter-spacing:.06em;background:var(--blue-light);color:var(--blue-dark);border:1px solid #c5cef5;
+        }
+        .users-count {
+            display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);
+            background:#f8f9fa;padding:4px 8px;border-radius:20px;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            display:none;position:fixed;inset:0;background:rgba(20,30,60,.45);
+            backdrop-filter:blur(3px);z-index:1000;align-items:center;justify-content:center;
+        }
+        .modal-overlay.show { display:flex; }
+        .modal-box {
+            background:white;border-radius:14px;padding:28px 32px;width:450px;max-width:90%;
+            box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .25s ease;
+        }
+        @keyframes modalIn {
+            from{opacity:0;transform:scale(.94) translateY(10px)}
+            to{opacity:1;transform:scale(1) translateY(0)}
+        }
+        .modal-title {
+            font-size:18px;font-weight:700;margin-bottom:20px;color:var(--text);
+            display:flex;align-items:center;gap:8px;
+        }
+        .modal-actions { display:flex;gap:10px;margin-top:22px;justify-content:flex-end; }
+
+        /* Stats cards */
+        .stats-grid {
+            display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;
+        }
+        .stat-card {
+            background:white;border-radius:var(--radius);padding:16px;border:1.5px solid var(--border);
+            display:flex;align-items:center;gap:15px;
+        }
+        .stat-icon {
+            width:48px;height:48px;border-radius:12px;background:var(--blue-light);
+            display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:20px;
+        }
+        .stat-content h3 { font-size:24px;font-weight:700;margin:0;line-height:1.2; }
+        .stat-content p { margin:0;font-size:12px;color:var(--text-muted); }
+
+        /* Floating action button pour mobile */
+        .fab-mobile {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+            font-size: 24px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+        .fab-mobile:hover {
+            transform: scale(1.1);
+            background: var(--blue-dark);
+        }
+
+        /* Search bar */
+        .search-box {
+            position:relative;margin-bottom:16px;
+        }
+        .search-box i {
+            position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);
+        }
+        .search-input {
+            width:100%;padding:10px 10px 10px 35px;border:1.5px solid var(--border);
+            border-radius:8px;font-size:13px;transition:all .2s;
+        }
+        .search-input:focus {
+            border-color:var(--blue);outline:none;box-shadow:0 0 0 3px rgba(102,126,234,.12);
+        }
+
+        /* Responsive */
+        @media(max-width:768px) {
+            .page-header { padding:24px 20px; }
+            .btn-primary.desktop-add { display:none; }
+            .fab-mobile { display:flex; }
+            .modal-box { padding:20px; }
+            .stats-grid { grid-template-columns:1fr; }
+            .inst-table { display:block;overflow-x:auto; }
+        }
+
+        @media(min-width:769px) {
+            .btn-primary.desktop-add { display:inline-flex; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <a th:href="@{/admin/questions}" class="back-link"><i class="fas fa-arrow-left"></i> Retour</a>
+    <div class="header-content">
+        <div>
+            <h1><i class="fas fa-users-cog" style="margin-right:10px;"></i>Gestion des Institutions</h1>
+            <p>Créez et gérez les institutions liées aux utilisateurs</p>
+        </div>
+        <!-- Bouton d'ajout desktop -->
+        <button class="btn-primary desktop-add" onclick="openAddModal()">
+            <i class="fas fa-plus-circle"></i> Nouvelle institution
+        </button>
+    </div>
+    <div class="nav-links">
+        <a th:href="@{/admin/users}" class="nav-link-btn"><i class="fas fa-users"></i> Utilisateurs</a>
+        <a th:href="@{/admin/institutions}" class="nav-link-btn active"><i class="fas fa-university"></i> Institutions</a>
+    </div>
+</div>
+
+<div class="container-fluid" style="max-width:1100px;padding:0 24px 60px;">
+
+    <!-- Messages flash -->
+    <div th:if="${success}" class="alert-custom alert-success-custom mb-3">
+        <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="alert-custom alert-error-custom mb-3">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+    </div>
+
+    <!-- Statistiques (à adapter selon vos données) -->
+    <!--    <div class="stats-grid" th:if="${institutions != null and !#lists.isEmpty(institutions)}">-->
+    <!--        <div class="stat-card">-->
+    <!--            <div class="stat-icon"><i class="fas fa-university"></i></div>-->
+    <!--            <div class="stat-content">-->
+    <!--                <h3 th:text="${#lists.size(institutions)}">12</h3>-->
+    <!--                <p>Institutions</p>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        <div class="stat-card">-->
+    <!--            <div class="stat-icon"><i class="fas fa-users"></i></div>-->
+    <!--            <div class="stat-content">-->
+    <!--                <h3 th:text="${totalUsers != null ? totalUsers : 0}">245</h3>-->
+    <!--                <p>Utilisateurs</p>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        <div class="stat-card">-->
+    <!--            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>-->
+    <!--            <div class="stat-content">-->
+    <!--                <h3 th:text="${avgUsersPerInstitution != null ? avgUsersPerInstitution : 0}">20</h3>-->
+    <!--                <p>Moy. par institution</p>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+
+    <!-- Barre de recherche et actions -->
+    <div class="d-flex justify-content-between align-items-center mb-3" th:if="${institutions != null and !#lists.isEmpty(institutions)}">
+        <div class="search-box" style="width:300px;">
+            <i class="fas fa-search"></i>
+            <input type="text" class="search-input" placeholder="Rechercher une institution..."
+                   onkeyup="filterInstitutions(this.value)" id="searchInput"/>
+        </div>
+        <div>
+            <button class="btn-outline me-2" onclick="exportInstitutions()">
+                <i class="fas fa-download"></i> Exporter
+            </button>
+            <button class="btn-outline" onclick="sortInstitutions()">
+                <i class="fas fa-sort-amount-down"></i> Trier
+            </button>
+        </div>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="card-custom">
+        <div class="card-header-custom">
+            <span><i class="header-content"></i> Liste des institutions</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span class="users-count" th:if="${institutions != null}">
+                    <i class="fas fa-university"></i>
+                    <span th:text="${#lists.size(institutions)}">0</span> total
+                </span>
+            </div>
+        </div>
+
+        <!-- État vide -->
+        <div th:if="${institutions == null or #lists.isEmpty(institutions)}"
+             style="text-align:center;padding:60px 40px;color:var(--text-muted);">
+            <i class="fas fa-university" style="font-size:48px;opacity:.2;display:block;margin-bottom:16px;"></i>
+            <h3 style="font-size:16px;margin-bottom:8px;">Aucune institution créée</h3>
+            <p style="font-size:13px;">Commencez par créer votre première institution</p>
+            <button class="btn-primary" onclick="openAddModal()" style="margin-top:10px;">
+                <i class="fas fa-plus"></i> Créer une institution
+            </button>
+        </div>
+
+        <!-- Table -->
+        <table class="inst-table" th:if="${institutions != null and !#lists.isEmpty(institutions)}" id="institutionsTable">
+            <thead>
+            <tr>
+                <th>Code</th>
+                <th>Nom</th>
+                <th>adress mail</th>
+                <th>Utilisateurs</th>
+                <th style="text-align:right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="inst : ${institutions}" th:attr="data-name=${inst.code}+' '+${inst.title}+' '+${inst.email}">
+                <td><span class="code-badge" th:text="${inst.code}"></span></td>
+                <td>
+                    <div style="font-weight:600;" th:text="${inst.title}"></div>
+                </td>
+                <td>
+                    <div style="font-weight:600;" th:text="${inst.email}"></div>
+                </td>
+                <td>
+                    <span class="users-count">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${#lists.size(inst.users)}"></span>
+                    </span>
+                    <!-- Petite barre de progression (optionnelle) -->
+                    <div style="width:60px;height:4px;background:#e0e0e0;border-radius:2px;margin-top:4px;" th:if="${#lists.size(inst.users) > 0}">
+                        <div style="height:4px;background:var(--blue);border-radius:2px;"
+                             th:style="'width:' + (${#lists.size(inst.users)} * 10) + 'px;max-width:60px;'"></div>
+                    </div>
+                </td>
+                <td style="text-align:right;">
+                    <div style="display:flex; gap:5px; justify-content:flex-end;">
+                        <!-- Voir les détails -->
+                        <button class="btn-icon"
+                                th:data-id="${inst.id}"
+                                th:data-code="${inst.code}"
+                                th:data-title="${inst.title}"
+                                th:data-email="${inst.email}"
+                                th:data-users="${#lists.size(inst.users)}"
+                                onclick="viewInstitution(this)"
+                                title="Voir les détails">
+                            <i class="fas fa-eye"></i>
+                        </button>
+
+                        <!-- Éditer -->
+                        <button class="btn-icon"
+                                th:data-id="${inst.id}"
+                                th:data-code="${inst.code}"
+                                th:data-title="${inst.title}"
+                                th:data-email="${inst.email}"
+                                onclick="openEditModal(this.getAttribute('data-id'), this.getAttribute('data-code'), this.getAttribute('data-title'), this.getAttribute('data-email'))"
+                                title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <!-- Gérer les utilisateurs -->
+                        <button class="btn-icon"
+                                th:data-id="${inst.id}"
+                                onclick="manageUsers(this.getAttribute('data-id'))"
+                                title="Gérer les utilisateurs">
+                            <i class="fas fa-users-cog"></i>
+                        </button>
+
+                        <!-- Supprimer -->
+                        <button class="btn-icon danger"
+                                th:data-id="${inst.id}"
+                                th:data-title="${inst.title}"
+                                th:data-users="${#lists.size(inst.users)}"
+                                th:data-email="${inst.email}"
+                                onclick="openDeleteModal(this.getAttribute('data-id'), this.getAttribute('data-title'), this.getAttribute('data-users'))"
+                                title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination (simplifiée sans dépendance) -->
+        <div th:if="${institutions != null and !#lists.isEmpty(institutions)}"
+             style="padding:16px 22px; border-top:1.5px solid var(--border);
+                    display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+            <div class="text-muted">
+                Total: <span th:text="${#lists.size(institutions)}"></span> institution(s)
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn-outline" onclick="alert('Pagination à implémenter côté serveur')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn-outline" style="background:var(--blue-light);border-color:var(--blue);">1</button>
+                <button class="btn-outline" onclick="alert('Pagination à implémenter côté serveur')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE D'AJOUT -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal-box">
+        <div class="modal-title">
+            <i class="fas fa-plus-circle" style="color:var(--blue);"></i>
+            Nouvelle institution
+        </div>
+        <form th:action="@{/admin/institutions/create}" method="post" id="addForm">
+            <div class="mb-3">
+                <label class="form-label-custom">Code / Sigle <span style="color:var(--danger);">*</span></label>
+                <input type="text" name="code" class="form-control-custom"
+                       placeholder="ex: ENSOA" required maxlength="20"
+                       style="text-transform:uppercase;" autocomplete="off"
+                       pattern="[A-Z0-9]+" title="Lettres majuscules et chiffres uniquement"/>
+                <div style="font-size:11px; color:#999; margin-top:4px;">
+                    <i class="fas fa-info-circle"></i> Majuscules et chiffres uniquement
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label-custom">Nom complet <span style="color:var(--danger);">*</span></label>
+                <input type="text" name="title" class="form-control-custom"
+                       placeholder="ex: École Nationale Supérieure..." required autocomplete="off"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label-custom">email <span style="color:var(--danger);">*</span></label>
+                <input type="email" name="email" class="form-control-custom"
+                       placeholder="ex: École Nationale Supérieure..." required autocomplete="off"/>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('addModal')">Annuler</button>
+                <button type="submit" class="btn-primary" onclick="return validateForm()">
+                    <i class="fas fa-save"></i> Créer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODALE ÉDITION -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div class="modal-title">
+            <i class="fas fa-edit" style="color:var(--blue);"></i>
+            Modifier l'institution
+        </div>
+        <form th:action="@{/admin/institutions/update}" method="post" id="editForm">
+            <input type="hidden" name="id" id="editId"/>
+            <div class="mb-3">
+                <label class="form-label-custom">Code / Sigle</label>
+                <input type="text" name="code" id="editCode" class="form-control-custom"
+                       required maxlength="20" style="text-transform:uppercase;"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label-custom">Nom complet</label>
+                <input type="text" name="title" id="editTitle" class="form-control-custom" required/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label-custom">email</label>
+                <input type="email" name="email" id="editemail" class="form-control-custom" required/>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Annuler</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODALE SUPPRESSION -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-title" style="color:var(--danger);">
+            <i class="fas fa-exclamation-triangle"></i>
+            Supprimer l'institution
+        </div>
+        <div style="background:#f8f9fa;padding:16px;border-radius:8px;margin-bottom:16px;">
+            <p style="margin:0 0 8px 0;font-weight:600;" id="deleteInstTitle"></p>
+            <div style="display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:12px;">
+                <i class="fas fa-users"></i>
+                <span id="deleteUserCount">0</span> utilisateur(s) associé(s)
+            </div>
+        </div>
+        <div style="background:var(--danger-light);padding:12px;border-radius:6px;margin-bottom:16px;">
+            <p style="margin:0;font-size:13px;color:var(--danger);">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Attention :</strong> Cette action supprimera définitivement l'institution
+                <span style="font-weight:600;">et tous ses utilisateurs associés</span>.
+            </p>
+        </div>
+        <form th:action="@{/admin/institutions/delete}" method="post">
+            <input type="hidden" name="id" id="deleteInstId"/>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Annuler</button>
+                <button type="submit" class="btn-danger" onclick="return confirm('Êtes-vous absolument sûr ?')">
+                    <i class="fas fa-trash"></i> Supprimer définitivement
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODALE DE DÉTAILS -->
+<div class="modal-overlay" id="viewModal">
+    <div class="modal-box" style="width:500px;">
+        <div class="modal-title">
+            <i class="fas fa-info-circle" style="color:var(--blue);"></i>
+            Détails de l'institution
+        </div>
+        <div id="viewContent" style="margin-bottom:20px; min-height:100px;">
+            <!-- Rempli dynamiquement par JS -->
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeModal('viewModal')">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- FLOATING ACTION BUTTON POUR MOBILE -->
+<button class="fab-mobile" onclick="openAddModal()" aria-label="Ajouter une institution">
+    <i class="fas fa-plus"></i>
+</button>
+
+<script>
+    // Gestionnaire d'ouverture des modales
+    function openAddModal() {
+        document.getElementById('addModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            const input = document.querySelector('#addModal input[name="code"]');
+            if (input) input.focus();
+        }, 100);
+    }
+
+    function openEditModal(id, code, title, email) {
+        document.getElementById('editId').value = id;
+        document.getElementById('editCode').value = code;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editemail').value = email;
+        document.getElementById('editModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function openDeleteModal(id, title, userCount) {
+        document.getElementById('deleteInstId').value = id;
+        document.getElementById('deleteInstTitle').textContent = title;
+        document.getElementById('deleteUserCount').textContent = userCount || '0';
+        document.getElementById('deleteModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function viewInstitution(button) {
+        const id = button.getAttribute('data-id');
+        const code = button.getAttribute('data-code');
+        const title = button.getAttribute('data-title');
+        const email = button.getAttribute('data-email');
+        const userCount = button.getAttribute('data-users');
+
+        const modal = document.getElementById('viewModal');
+        const content = document.getElementById('viewContent');
+
+        // Version simplifiée sans date
+        content.innerHTML = `
+            <div class="stat-card" style="margin-bottom:15px;">
+                <div class="stat-icon"><i class="fas fa-university"></i></div>
+                <div class="stat-content">
+                    <h3>` + title + `</h3>
+                    <p>Code: ` + code + `</p>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div style="background:#f8f9fa;padding:10px;border-radius:6px;">
+                    <div style="font-size:11px;color:var(--text-muted);">Utilisateurs</div>
+                    <div style="font-size:18px;font-weight:700;">` + userCount + `</div>
+                </div>
+                <div style="background:#f8f9fa;padding:10px;border-radius:6px;">
+                    <div style="font-size:11px;color:var(--text-muted);">ID</div>
+                    <div style="font-size:14px;">#` + id + `</div>
+                </div>
+            </div>
+        `;
+
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function manageUsers(instId) {
+        window.location.href = '/admin/users?institutionId=' + instId;
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Validation formulaire
+    function validateForm() {
+        const code = document.querySelector('#addModal input[name="code"]').value;
+        if (code && !code.match(/^[A-Z0-9]+$/)) {
+            alert('Le code doit contenir uniquement des majuscules et des chiffres');
+            return false;
+        }
+        return true;
+    }
+
+    // Recherche en direct
+    function filterInstitutions(query) {
+        const table = document.getElementById('institutionsTable');
+        if (!table) return;
+
+        const rows = table.getElementsByTagName('tr');
+        const searchTerm = query.toLowerCase();
+
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const text = row.getAttribute('data-name') || row.textContent.toLowerCase();
+            if (text.toLowerCase().includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    }
+
+    // Export (simulé)
+    function exportInstitutions() {
+        alert('Fonction d\'export à implémenter côté serveur');
+    }
+
+    // Tri
+    function sortInstitutions() {
+        const table = document.getElementById('institutionsTable');
+        if (!table) return;
+
+        const rows = Array.from(table.getElementsByTagName('tr')).slice(1);
+        rows.sort((a, b) => {
+            const aName = a.getAttribute('data-name') || '';
+            const bName = b.getAttribute('data-name') || '';
+            return aName.localeCompare(bName);
+        });
+
+        const tbody = table.getElementsByTagName('tbody')[0];
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Fermeture des modales avec Echap
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.show').forEach(modal => {
+                modal.classList.remove('show');
+            });
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Fermeture en cliquant sur l'overlay
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+</script>
+</body>
+</html>

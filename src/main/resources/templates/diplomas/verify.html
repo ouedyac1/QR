@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification de Diplôme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 3rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .verification-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-icon.valid {
+            animation: checkmark 0.5s ease-in-out;
+        }
+
+        @keyframes checkmark {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .status-icon.invalid {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h1.valid {
+            color: #28a745;
+        }
+
+        h1.invalid {
+            color: #dc3545;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .alert {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 3px solid #28a745;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border: 3px solid #dc3545;
+            color: #721c24;
+        }
+
+        .diploma-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .info-label {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #667eea, transparent);
+            margin: 2rem 0;
+        }
+
+        .timestamp {
+            text-align: center;
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            margin: 1rem 0;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .warning-message h3 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-message p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- DIPLÔME VALIDE -->
+    <div th:if="${verified}">
+        <div class="verification-header">
+            <div class="status-icon valid">✅</div>
+            <h1 class="valid">Diplôme Authentique</h1>
+            <p class="subtitle">Ce diplôme a été vérifié avec succès</p>
+        </div>
+
+        <div class="alert alert-success">
+            ✓ Ce diplôme est officiellement reconnu et valide
+        </div>
+
+        <div class="security-badge">
+            🔒 Certificat sécurisé par QR Code
+        </div>
+
+        <div class="diploma-info">
+            <h2 style="color: #333; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                📋 Informations du diplômé
+            </h2>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Code Unique</span>
+                    <span class="info-value" th:text="${person.uniqueCode}">DIP-XXXXXX</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Nom Complet</span>
+                    <span class="info-value" th:text="${person.fullName}">Nom Prénom</span>
+                </div>
+
+                <div class="info-item" th:if="${person.titre}">
+                    <span class="info-label">Titre</span>
+                    <span class="info-value" th:text="${person.titre}">Titre</span>
+                </div>
+
+                <div class="info-item" th:if="${person.grade}">
+                    <span class="info-label">Grade</span>
+                    <span class="info-value" th:text="${person.grade}">Grade</span>
+                </div>
+
+                <div class="info-item" th:if="${person.email}">
+                    <span class="info-label">Email</span>
+                    <span class="info-value" th:text="${person.email}">email@example.com</span>
+                </div>
+
+<!--                <div class="info-item" th:if="${person.datePromotion}">-->
+<!--                    <span class="info-label">Date de Promotion</span>-->
+<!--                    <span class="info-value" th:text="${#temporals.format(person.datePromotion, 'dd/MM/yyyy')}">01/01/2025</span>-->
+<!--                </div>-->
+
+                <div class="info-item" th:if="${person.nationalite}">
+                    <span class="info-label">Nationalité</span>
+                    <span class="info-value" th:text="${person.nationalite}">Nationalité</span>
+                </div>
+
+<!--                <div class="info-item" th:if="${person.derniereFonction}">-->
+<!--                    <span class="info-label">Dernière Fonction</span>-->
+<!--                    <span class="info-value" th:text="${person.derniereFonction}">Fonction</span>-->
+<!--                </div>-->
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="info-grid">
+                <div class="info-item" th:if="${person.dateNaissance}">
+                    <span class="info-label">Date de Naissance</span>
+                    <span class="info-value" th:text="${#temporals.format(person.dateNaissance, 'dd/MM/yyyy')}">01/01/1990</span>
+                </div>
+
+                <div class="info-item" th:if="${person.lieuNaissance}">
+                    <span class="info-label">Lieu de Naissance</span>
+                    <span class="info-value" th:text="${person.lieuNaissance}">Ville</span>
+                </div>
+
+                <div class="info-item" th:if="${person.pays}">
+                    <span class="info-label">Pays</span>
+                    <span class="info-value" th:text="${person.pays}">Pays</span>
+                </div>
+
+<!--                <div class="info-item" th:if="${person.region}">-->
+<!--                    <span class="info-label">Région</span>-->
+<!--                    <span class="info-value" th:text="${person.region}">Région</span>-->
+<!--                </div>-->
+            </div>
+        </div>
+
+        <div class="timestamp">
+            <p>🕐 Vérifié le <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy à HH:mm')}"></span></p>
+            <p style="margin-top: 0.5rem;">Émis le <span th:text="${#temporals.format(person.createdAt, 'dd/MM/yyyy')}"></span></p>
+            <p style="margin-top: 0.5rem;">L'authenticité du présent document peut être confirmée à l'adresse email
+                <strong>
+                    <span class="info-value" th:text="${person.institution.email}">email@example.com</span>
+                </strong>
+            </p>
+        </div>
+    </div>
+
+    <!-- DIPLÔME INVALIDE -->
+    <div th:unless="${verified}">
+        <div class="verification-header">
+            <div class="status-icon invalid">❌</div>
+            <h1 class="invalid">Diplôme Non Authentique</h1>
+            <p class="subtitle">Ce diplôme n'a pas pu être vérifié</p>
+        </div>
+
+        <div class="alert alert-danger">
+            ⚠️ <span th:text="${message}">Ce code ne correspond à aucun diplôme valide</span>
+        </div>
+
+        <div class="warning-message">
+            <h3>⚠️ Attention - Document Suspect</h3>
+            <p>
+                Le QR code scanné ne correspond à aucun diplôme enregistré dans notre base de données,
+                ou le diplôme a été révoqué. Ce document peut être :
+            </p>
+            <ul style="margin-top: 1rem; padding-left: 1.5rem; line-height: 1.8;">
+                <li>Un faux document</li>
+                <li>Un diplôme annulé ou révoqué</li>
+                <li>Un QR code endommagé ou corrompu</li>
+            </ul>
+            <p style="margin-top: 1rem; font-weight: 600;">
+                En cas de doute, veuillez contacter l'organisme émetteur pour vérification.
+            </p>
+        </div>
+    </div>
+
+    <a href="/index" class="btn btn-primary">
+        🏠 Retour à l'accueil
+    </a>
+</div>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Événements</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* ─── Header ─────────────────────────────────── */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .site-logo { max-height: 60px; }
+        .header-titles h1 { font-size: 1.8rem; font-weight: 700; }
+        .header-titles p  { margin-top: .3rem; opacity: .85; font-size: .95rem; }
+
+        .nav-link {
+            background: rgba(255,255,255,.2);
+            color: white;
+            padding: .65rem 1.25rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: .9rem;
+            transition: all .3s ease;
+            border: 1px solid rgba(255,255,255,.15);
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,.32);
+            transform: translateY(-1px);
+        }
+
+        /* ─── Main ───────────────────────────────────── */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* ─── Stats ──────────────────────────────────── */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,.12);
+        }
+        .stat-icon {
+            width: 56px; height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+        .stat-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .stat-icon.success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .stat-info h3 { color: #999; font-size: .85rem; font-weight: 500; margin-bottom: .2rem; }
+        .stat-info p  { color: #333; font-size: 1.8rem; font-weight: 700; }
+
+        /* ─── Grid ───────────────────────────────────── */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.75rem;
+        }
+        @media(max-width: 768px) { .content-grid { grid-template-columns: 1fr; } }
+
+        /* ─── Card ───────────────────────────────────── */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            overflow: hidden;
+            transition: box-shadow .2s ease;
+        }
+        .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .card-header-icon {
+            width: 36px; height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .card-header-icon.blue   { background: #e7f0ff; }
+        .card-header-icon.purple { background: #f3eeff; }
+
+        .card-header-text h3 { font-size: .95rem; font-weight: 600; color: #333; }
+        .card-header-text p  { font-size: .78rem; color: #999; margin-top: .1rem; }
+
+        .card-body { padding: 1.5rem; }
+
+        /* ─── Event list ─────────────────────────────── */
+        .event-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.1rem;
+            background: #f8f9ff;
+            border: 1px solid #e7f0ff;
+            border-left: 4px solid #667eea;
+            border-radius: 10px;
+            margin-bottom: .75rem;
+            transition: all .2s ease;
+        }
+        .event-item:last-child { margin-bottom: 0; }
+        .event-item:hover {
+            background: #eef2ff;
+            border-color: #667eea;
+            transform: translateX(3px);
+        }
+        .event-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: .25rem;
+        }
+        .event-slug {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            font-size: .75rem;
+            color: #667eea;
+            background: #e7f0ff;
+            padding: .15rem .55rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ─── Empty state ────────────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: #999;
+        }
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            opacity: .4;
+        }
+        .empty-state h4 { font-size: .95rem; color: #555; margin-bottom: .35rem; }
+        .empty-state p  { font-size: .82rem; }
+
+        /* ─── Form ───────────────────────────────────── */
+        .form-group { margin-bottom: 1.2rem; }
+        label {
+            display: block;
+            font-size: .82rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: .45rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: .75rem 1rem;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: .92rem;
+            color: #333;
+            background: #f8f9ff;
+            border: 1.5px solid #e0e7ff;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color .25s, box-shadow .25s;
+        }
+        input[type="text"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,.15);
+            background: #fff;
+        }
+        input[type="text"]::placeholder { color: #bbb; }
+        .hint { font-size: .75rem; color: #999; margin-top: .4rem; }
+
+        .divider { height: 1px; background: #f0f0f0; margin: 1.25rem 0; }
+
+        /* ─── Buttons ────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .45rem;
+            padding: .65rem 1.25rem;
+            border-radius: 8px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: .88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .25s ease;
+            border: none;
+            text-decoration: none;
+        }
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            margin-top: .5rem;
+            box-shadow: 0 2px 8px rgba(102,126,234,.35);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 16px rgba(102,126,234,.5);
+            transform: translateY(-1px);
+        }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #e0e7ff;
+            color: #667eea;
+            font-size: .78rem;
+            padding: .4rem .9rem;
+            white-space: nowrap;
+        }
+        .btn-outline:hover {
+            background: #e7f0ff;
+            border-color: #667eea;
+        }
+
+        /* ─── Animations ─────────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .stats-container { animation: fadeUp .4s ease both; }
+        .content-grid    { animation: fadeUp .4s .1s ease both; }
+
+        main {
+            /*max-width: 7000px;   !* ← adapte selon tes besoins *!*/
+            margin-left: 30%;
+            /*margin-right: 50%;*/
+            /*padding: 0 2rem 4rem;*/
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ──────────────────────────────────────────── -->
+<header>
+    <div class="header-content">
+        <div class="header-left">
+            <img th:src="@{/img/logo.png}" alt="Logo" class="site-logo"/>
+            <div class="header-titles">
+                <h1>Gestion des Événements</h1>
+                <p>Consultez et créez vos événements en quelques secondes</p>
+            </div>
+    </div>
+    </div>
+    </div>
+</header>
+
+<!-- ─── Main ────────────────────────────────────────────── -->
+<main>
+    <div class="content-grid">
+
+        <!-- ── Créer un événement ── -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-icon purple">➕</div>
+                <div class="card-header-text">
+                    <h3>Nouvel événement</h3>
+                    <p>Le slug sera généré automatiquement</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/event/create}" th:object="${newEvent}" method="post">
+                    <div class="form-group">
+                        <label for="eventName">Nom de l'événement</label>
+                        <input
+                                type="text"
+                                id="eventName"
+                                th:field="*{name}"
+                                autocomplete="off"
+                                required
+                        >
+                        <p class="hint">Utilisez un nom clair et mémorable.</p>
+                    </div>
+                    <div class="divider"></div>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                            <polyline points="17 21 17 13 7 13 7 21"/>
+                            <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        Enregistrer l'événement
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

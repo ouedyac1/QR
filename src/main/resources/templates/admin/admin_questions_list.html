@@ -199,30 +199,15 @@
         }
 
         .question-text {
-            color: #222;
-            line-height: 1.8;
-            font-size: 1.1rem;
-            margin-bottom: 1.2rem;
-            padding: 1.25rem 1.5rem;
-            background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
-            border-radius: 10px;
-            border-left: 6px solid #667eea;
-            box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.1);
-            position: relative;
-            padding-left: 2.5rem;
-            font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+            color: #333;
+            line-height: 1.6;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
         }
-
-        .question-text::before {
-            content: "❝";
-            font-size: 2rem;
-            color: #667eea;
-            position: absolute;
-            top: 8px;
-            left: 12px;
-            opacity: 0.3;
-        }
-
 
         .question-footer {
             display: flex;
@@ -280,41 +265,6 @@
             color: #666;
         }
 
-        .event-badge {
-            text-align: center;
-            padding: 20px;
-            background: #ffffff;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .question-number {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 700;
-            border-radius: 50%;
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.95rem;
-            flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-
-        @media (max-width: 768px) {
-            .question-number {
-                width: 36px;
-                height: 36px;
-                font-size: 0.85rem;
-            }
-        }
-
-
-        .site-logo {
-            max-height: 80px;
-        }
-
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -333,112 +283,141 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="event-badge">
+<header>
+    <div class="event-badge">
             <img th:src="@{/img/logo.png}" alt="Logo" class="site-logo"/>
-            <!--            📱 <span th:text="${event.name}">Événement</span>-->
+
+    </div>
+    <div class="header-content">
+        <div>
+            <h1>Administration</h1>
+            <p style="margin-top: 0.5rem; opacity: 0.9;">Gestion des questions reçues</p>
         </div>
+        <a href="/" class="home-link">🏠 Retour à l'accueil</a>
+        <a href="/admin/questions/export/pdf" class="home-link">Exporter en PDF</a>
+        <a href="/" class="home-link">Gestion des Diplomes</a>
+    </div>
+</header>
+
+<main>
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon primary">💬</div>
+            <div class="stat-info">
+                <h3>Total des questions</h3>
+                <p th:text="${questions.size()}">0</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">📅</div>
+            <div class="stat-info">
+                <h3>Événements actifs</h3>
+                <p th:text="${events.size()}">0</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">⏰</div>
+            <div class="stat-info">
+                <h3>Aujourd'hui</h3>
+                <p th:text="${#lists.size(#lists.isEmpty(questions) ? {} : questions)}">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="filters" th:if="${!events.isEmpty()}">
         <div class="header-content">
-            <div>
-                <h1>Administration</h1>
-                <p style="margin-top: 0.5rem; opacity: 0.9;">Gestion des questions reçues</p>
-            </div>
-            <a href="/" class="home-link">Retour à l'accueil</a>
-            <a href="/admin/questions/export/pdf" class="home-link">📄 Exporter en PDF</a>
-
-        </div>
-<!--        <div style="text-align: right; margin-bottom: 1rem;">-->
-<!--            <a href="/admin/questions/export/pdf" class="home-link">📄 Exporter en PDF</a>-->
-<!--        </div>-->
-
-    </header>
-
-    <main>
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-icon primary">💬</div>
-                <div class="stat-info">
-                    <h3>Total des questions</h3>
-                    <p th:text="${questions.size()}">0</p>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon success">📅</div>
-                <div class="stat-info">
-                    <h3>Événements actifs</h3>
-                    <p th:text="${events.size()}">0</p>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon warning">⏰</div>
-                <div class="stat-info">
-                    <h3>Aujourd'hui</h3>
-                    <p th:text="${#lists.size(#lists.isEmpty(questions) ? {} : questions)}">0</p>
-                </div>
+            <h2>Filtrer par évènement</h2>
+            <div class="filter-btn active">
+                <a href="/event" class="home-link">Nouvel évènement</a>
             </div>
         </div>
+        <div class="filter-buttons">
 
-        <div class="filters" th:if="${!events.isEmpty()}">
-            <h2>Filtrer par événement</h2>
-            <div class="filter-buttons">
-                <a href="/admin/questions" class="filter-btn active">📋 Toutes les questions</a>
-                <a th:each="event : ${events}"
-                   th:href="@{/admin/questions/event/{id}(id=${event.id})}"
-                   class="filter-btn">
-                    🎯 <span th:text="${event.name}">Événement</span>
-                </a>
-            </div>
+            <!-- Toutes les questions -->
+            <a href="/admin/questions"
+               class="filter-btn"
+               th:classappend="${selectedEventId == null} ? ' active' : ''">
+                Toutes les questions
+            </a>
+
+            <!-- Un bouton par �v�nement -->
+            <a th:each="event : ${events}"
+               th:href="@{/admin/questions/event/{id}(id=${event.id})}"
+               class="filter-btn"
+               th:classappend="${selectedEventId == event.id} ? ' active' : ''">
+                <span th:text="${event.name}">évènement</span>
+            </a>
+
         </div>
 
-        <div class="questions-container" th:if="${!questions.isEmpty()}">
-            <div th:each="question, iter : ${questions}" class="question-card">
-                <div class="question-header">
-                    <div class="question-number">
-                        <span th:text="'#' + ${iter.count}">#1</span>
+        <!-- Section QR Codes -->
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e0e0e0;">
+            <h2 style="margin-bottom: 1rem;">QR Codes des événements</h2>
+            <div class="qr-grid">
+                <div th:each="event : ${events}" class="qr-event-card">
+                    <div class="qr-event-name" th:text="${event.name}">Événement</div>
+                    <div class="qr-event-actions">
+                        <a th:href="@{/event/{slug}/qrcode(slug=${event.slug})}"
+                           class="btn-qr btn-view"
+                           target="_blank">
+                            📱 Voir QR Code
+                        </a>
+                        <a th:href="@{/admin/questions/export/pdf/event/{id}(id=${event.id})}"
+                           class="btn-qr btn-export">
+                            📥 Export PDF
+                        </a>
                     </div>
-                    <div class="question-meta">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="questions-container" th:if="${!questions.isEmpty()}">
+        <div th:each="question : ${questions}" class="question-card">
+            <div class="question-header">
+                <div class="question-meta">
                         <span th:if="${question.participantName != null and !#strings.isEmpty(question.participantName)}"
                               class="participant-name"
                               th:text="${question.participantName}">
                             Nom du participant
                         </span>
-                        <span th:if="${question.participantName == null or #strings.isEmpty(question.participantName)}"
-                              class="participant-name anonymous">
+                    <span th:if="${question.participantName == null or #strings.isEmpty(question.participantName)}"
+                          class="participant-name anonymous">
                             👤 Anonyme
                         </span>
-                        <span class="question-date"
-                              th:text="${#temporals.format(question.submittedAt, 'dd/MM/yyyy à HH:mm')}">
+                    <span class="question-date"
+                          th:text="${#temporals.format(question.submittedAt, 'dd/MM/yyyy à HH:mm')}">
                             Date
                         </span>
-                    </div>
                 </div>
+            </div>
 
-                <div class="question-text" th:text="${question.question}">
-                    Texte de la question
-                </div>
+            <div class="question-text" th:text="${question.question}">
+                Texte de la question
+            </div>
 
-                <div class="question-footer">
+            <div class="question-footer">
                     <span class="event-badge" th:text="${question.event.name}">
                         Événement
                     </span>
 
-<!--                    <form th:action="@{/admin/questions/delete/{id}(id=${question.id})}" -->
-<!--                          method="post" -->
-<!--                          style="margin: 0;"-->
-<!--                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette question ?');">-->
-<!--                        <button type="submit" class="delete-btn">🗑️ Supprimer</button>-->
-<!--                    </form>-->
-                </div>
+                <form th:action="@{/admin/questions/delete/{id}(id=${question.id})}"
+                      method="post"
+                      style="margin: 0;"
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette question ?');">
+                    <button type="submit" class="delete-btn">🗑️ Supprimer</button>
+                </form>
             </div>
         </div>
+    </div>
 
-        <div class="empty-state" th:if="${questions.isEmpty()}">
-            <div class="empty-state-icon">📭</div>
-            <h3>Aucune question reçue</h3>
-            <p>Les questions posées par les participants apparaîtront ici.</p>
-        </div>
-    </main>
+    <div class="empty-state" th:if="${questions.isEmpty()}">
+        <div class="empty-state-icon">📭</div>
+        <h3>Aucune question reçue</h3>
+        <p>Les questions posées par les participants apparaîtront ici.</p>
+    </div>
+</main>
 </body>
 </html>
