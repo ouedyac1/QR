@@ -113,7 +113,7 @@
         <p th:text="${success}"></p>
     </div>
 
-    <form th:action="@{/ask/{slug}(slug=${event.slug})}"
+    <form th:action="@{/questions/ask/{slug}(slug=${event.slug})}"
           th:object="${userQuestion}"
           method="post">
 

@@ -122,13 +122,13 @@
             <input type="text" id="searchInput" placeholder="🔍 Rechercher un nom, grade ou code..." onkeyup="searchTable()">
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <a th:href="@{/download-template}" class="btn btn-info">📥 Modèle</a>
-            <a th:href="@{/upload}" class="btn btn-primary">⬆️ Importer</a>
+            <a th:href="@{/download-template}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="btn btn-info">📥 Modèle</a>
+            <a th:href="@{/upload}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="btn btn-primary">⬆️ Importer</a>
             <!--a th:href="@{/qrcode/download-all}" class="btn btn-success" th:if="${persons != null and !persons.isEmpty()}">📦 Tous les QR</a-->
             <a th:href="@{/qrcode/download-all(institutionCode=${selectedInstitution})}"
                class="btn btn-success"
                th:if="${!persons.isEmpty()}">
-                📦import QR (<span th:text="${selectedInstitution != null ? selectedInstitution : 'Tous'}"></span>)
+                📦Téléchargé QR (<span th:text="${selectedInstitution != null ? selectedInstitution : 'Tous'}"></span>)
             </a>
         </div>
     </div>

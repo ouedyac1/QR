@@ -231,7 +231,7 @@
     <p class="subtitle">QR Code pour poser vos questions</p>
 
     <div class="qr-container">
-        <img th:src="@{/qrcode/{slug}(slug=${event.slug})}"
+        <img th:src="@{/questions/qrcode/{slug}(slug=${event.slug})}"
              th:alt="'QR Code ' + ${event.name}"
              class="qr-code"
              id="qrCodeImage" />

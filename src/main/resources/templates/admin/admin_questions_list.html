@@ -344,7 +344,7 @@
 
             <!-- Un bouton par �v�nement -->
             <a th:each="event : ${events}"
-               th:href="@{/admin/questions/event/{id}(id=${event.id})}"
+               th:href="@{/questions/admin/questions/event/{id}(id=${event.id})}"
                class="filter-btn"
                th:classappend="${selectedEventId == event.id} ? ' active' : ''">
                 <span th:text="${event.name}">évènement</span>
@@ -359,7 +359,7 @@
                 <div th:each="event : ${events}" class="qr-event-card">
                     <div class="qr-event-name" th:text="${event.name}">Événement</div>
                     <div class="qr-event-actions">
-                        <a th:href="@{/event/{slug}/qrcode(slug=${event.slug})}"
+                        <a th:href="@{/questions/event/{slug}/qrcode(slug=${event.slug})}"
                            class="btn-qr btn-view"
                            target="_blank">
                             📱 Voir QR Code
@@ -403,7 +403,7 @@
                         Événement
                     </span>
 
-                <form th:action="@{/admin/questions/delete/{id}(id=${question.id})}"
+                <form th:action="@{/questions/admin/questions/delete/{id}(id=${question.id})}"
                       method="post"
                       style="margin: 0;"
                       onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette question ?');">

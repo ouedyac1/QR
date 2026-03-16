@@ -248,12 +248,20 @@
             <strong>Taille :</strong> <span id="fileSize"></span>
         </div>
 
+        <div th:if="${isSuperAdmin}" style="margin-top: 2rem; margin-bottom: 1rem;">
+            <label for="institutionId" style="display:block; margin-bottom:0.5rem; font-weight:600; color:#333;">Sélectionnez une institution (Super Admin)</label>
+            <select name="institutionId" id="institutionId" style="width:100%; padding:1rem; border-radius:10px; border:2px solid #ddd; font-size:1rem; outline:none; transition:border-color 0.3s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#ddd'" required>
+                <option value="" disabled selected>-- Choisissez l'institution cible --</option>
+                <option th:each="inst : ${institutions}" th:value="${inst.id}" th:text="${inst.code + ' - ' + inst.title}"></option>
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
             ⬆️ Importer les données
         </button>
     </form>
 
-    <a href="/index" class="btn btn-secondary">← Retour à la liste</a>
+    <a href="/" class="btn btn-secondary">← Retour à la liste</a>
 </div>
 
 <script>
