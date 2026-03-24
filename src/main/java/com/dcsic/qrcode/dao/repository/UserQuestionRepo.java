@@ -7,4 +7,7 @@ import java.util.List;
 public interface UserQuestionRepo extends JpaRepository<UserQuestion, Long> {
     List<UserQuestion> findByEventIdOrderBySubmittedAtDesc(Long eventId);
     List<UserQuestion> findAllByOrderBySubmittedAtDesc();
+    List<UserQuestion> findAllByOrderByEventNameAscSubmittedAtAsc();
+    List<UserQuestion> findAllByOrderBySubmittedAtAsc();
+    List<UserQuestion> findByEventIdOrderBySubmittedAtAsc(Long eventId);
 }

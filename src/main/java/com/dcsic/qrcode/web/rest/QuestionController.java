@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
+@RequestMapping("/questions")
 public class QuestionController {
 
     private final EventRepo eventRepository;
@@ -37,26 +38,26 @@ public class QuestionController {
     }
 
     // Page d'accueil - affiche le QR code
-    @GetMapping("/")
-    public String home(Model model) {
-        Event event = eventRepository.findAll().stream()
-                .findFirst()
-                .orElse(null);
-
-        if (event == null) {
-            model.addAttribute("message", "Aucun événement créé. Créez-en un depuis l'admin.");
-            return "no-event";
-        }
-
-        model.addAttribute("event", event);
-        return "qrcode_display";
-    }
+//    @GetMapping("/")
+//    public String home(Model model) {
+//        Event event = eventRepository.findAll().stream()
+//                .findFirst()
+//                .orElse(null);
+//
+//        if (event == null) {
+//            model.addAttribute("message", "Aucun événement créé. Créez-en un depuis l'admin.");
+//            return "no-event";
+//        }
+//
+//        model.addAttribute("event", event);
+//        return "qrcode_display";
+//    }
 
     // Génération de l'image QR code
     @GetMapping("/qrcode/{slug}")
     public void generateQrCode(@PathVariable String slug, HttpServletResponse response)
             throws IOException, WriterException {
-        String url = "https://qrcode.defense.bf/ask/" + slug;
+        String url = "https://qrcode.defense.bf/questions/ask/" + slug;
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         var bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, 350, 350);
         response.setContentType("image/png");
@@ -85,11 +86,11 @@ public class QuestionController {
         userQuestionRepo.save(userQuestion);
 
         redirectAttributes.addFlashAttribute("success", "Merci ! Votre question a été envoyée.");
-        return "redirect:/ask/" + slug;
+        return "redirect:/questions/ask/" + slug;
     }
 
     // Admin - Liste des questions
-    @GetMapping("/admin/questions")
+/*    @GetMapping("/admin/questions")
     public String listQuestions(Model model) {
         model.addAttribute("questions", userQuestionRepo.findAllByOrderBySubmittedAtDesc());
         model.addAttribute("events", eventRepository.findAll());
@@ -104,13 +105,13 @@ public class QuestionController {
         model.addAttribute("event", event);
         model.addAttribute("questions", userQuestionRepo.findByEventIdOrderBySubmittedAtDesc(eventId));
         return "admin/questions-by-event";
-    }
+    }*/
 
     // Admin - Supprimer une question
     @PostMapping("/admin/questions/delete/{id}")
     public String deleteQuestion(@PathVariable Long id) {
         userQuestionRepo.deleteById(id);
-        return "redirect:/admin/questions";
+        return "redirect:/questions/admin/questions";
     }
 
     @GetMapping("/admin/questions/export/pdf")
@@ -124,5 +125,59 @@ public class QuestionController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=questions.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
+    }
+    
+        // NOUVEAU : Export PDF des questions par événement
+    @GetMapping("/admin/questions/export/pdf/event/{eventId}")
+    public ResponseEntity<byte[]> exportQuestionsByEventPdf(@PathVariable Long eventId) throws Exception {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Événement non trouvé"));
+
+        List<UserQuestion> questions = userQuestionRepo.findByEventIdOrderBySubmittedAtDesc(eventId);
+        byte[] pdf = pdfExportService.exportQuestionsByEvent(event, questions);
+
+        // Nom de fichier avec le slug de l'événement
+        String filename = "questions_" + event.getSlug() + ".pdf";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+    
+        // Page d'affichage du QR code pour UN événement spécifique
+      @GetMapping("/event/{slug}/qrcode")
+      public String showEventQRCode(@PathVariable String slug, Model model) {
+          Event event = eventRepository.findBySlug(slug)
+                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                          "Événement non trouvé"));
+
+        // Compter les questions pour cet événement
+        long questionCount = userQuestionRepo.findByEventIdOrderBySubmittedAtDesc(event.getId()).size();
+
+        model.addAttribute("event", event);
+        model.addAttribute("questionCount", questionCount);
+
+        return "event-qrcode";
+    }
+    
+        // Admin - Liste des questions by event
+    @GetMapping("/admin/questions/event/{eventId}")
+    public String listQuestionsByEvent(@PathVariable Long eventId, Model model) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        model.addAttribute("questions", userQuestionRepo.findByEventIdOrderBySubmittedAtAsc(eventId)); // ← Desc → Asc
+        model.addAttribute("events", eventRepository.findAll());
+        model.addAttribute("selectedEventId", eventId);
+        return "admin/admin_questions_list";
+    }
+
+    // Toutes les questions —
+    @GetMapping("/admin/questions")
+    public String listQuestions(Model model) {
+        model.addAttribute("events", eventRepository.findAll());
+        model.addAttribute("selectedEventId", null);
+        model.addAttribute("questions", userQuestionRepo.findAllByOrderByEventNameAscSubmittedAtAsc());
+        return "admin/admin_questions_list";
     }
 }
